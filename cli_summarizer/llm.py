@@ -19,9 +19,9 @@ def load_env():
                         os.environ[key.strip()] = value.strip()
         except Exception as e:
             print(f"警告: .env の読み込みに失敗しました: {e}", file=sys.stderr)
+        # add more debug codes later
 
-
-def summarize(text: str) -> tuple[str, str, str]:
+def summarize(text: str) -> tuple[str, str]:
     """
     テキストを OpenAI API に送信し、要約と推奨ファイル名を取得する。
     標準ライブラリの urllib を使用し、JSON 形式で結果を受け取る。
@@ -29,7 +29,7 @@ def summarize(text: str) -> tuple[str, str, str]:
     Args:
         text: 入力テキスト
     Returns:
-        tuple: (original_text, summarized_text, suggested_filename)
+        tuple: (summarized_text, suggested_filename)
     """
     # if the user already has OPENAI_API_KEY set in their shell (e.g. .zshrc), skip reading the file
     if not os.environ.get("OPENAI_API_KEY"):
@@ -76,7 +76,7 @@ def summarize(text: str) -> tuple[str, str, str]:
             summary = content.get("summary", "")
             filename = content.get("filename", "summary")
             
-            return text, summary, filename
+            return summary, filename
             
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")

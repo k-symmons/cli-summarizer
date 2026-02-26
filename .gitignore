@@ -33,7 +33,6 @@ MANIFEST
 
 # Summaries
 *.txt
-!test1.txt
 
 # llms
 .agents

@@ -82,7 +82,8 @@ def main():
         print("エラー: 処理するコンテンツがありません", file=sys.stderr)
         sys.exit(1)
 
-    _, summary, filename_base = summarize(content)
+    print("要約を開始します...")
+    summary, filename_base = summarize(content)
     output_path = save_summary(filename_base, summary)
     print(f"要約を {output_path} に保存しました。")
     print("-" * 20)
