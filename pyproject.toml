@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cli-summarizer"
+version = "0.1.0"
+description = "A Python CLI tool that summarizes text using the OpenAI API."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name="shimonzuikki" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+cli-summarizer = "cli_summarizer.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cli_summarizer*"]
