@@ -3,7 +3,7 @@ import os
 import pathlib
 import sys
 
-from .llm import summarize, _ENV_PATH
+from .llm import summarize, _ENV_PATH,save_api_key_to_env
 
 
 def parse_args():
@@ -19,16 +19,6 @@ def parse_args():
     return args
 
 
-def save_api_key_to_env(api_key):
-    """APIキーを .env ファイルに保存する"""
-    _ENV_PATH.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with open(_ENV_PATH, "w", encoding="utf-8") as f:
-            f.write(f"OPENAI_API_KEY={api_key}\n")
-        print(f"APIキーを {_ENV_PATH} に保存しました。")
-    except IOError as e:
-        print(f"エラー: .env ファイルの保存に失敗しました: {e}", file=sys.stderr)
-        sys.exit(1)
 
 
 def get_content(args):

@@ -6,6 +6,17 @@ import urllib.request
 
 _ENV_PATH = pathlib.Path.home() / ".config" / "cli-summarizer" / ".env"
 
+def save_api_key_to_env(api_key):
+    """APIキーを .env ファイルに保存する"""
+    _ENV_PATH.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(_ENV_PATH, "w", encoding="utf-8") as f:
+            f.write(f"OPENAI_API_KEY={api_key}\n")
+        print(f"APIキーを {_ENV_PATH} に保存しました。")
+    except IOError as e:
+        print(f"エラー: .env ファイルの保存に失敗しました: {e}", file=sys.stderr)
+        sys.exit(1)
+
 
 def load_env():
     """ .env ファイルから環境変数を読み込む (簡易実装) """
@@ -19,7 +30,7 @@ def load_env():
                         os.environ[key.strip()] = value.strip()
         except Exception as e:
             print(f"警告: .env の読み込みに失敗しました: {e}", file=sys.stderr)
-        # add more debug codes later
+
 
 def summarize(text: str) -> tuple[str, str]:
     """
@@ -85,3 +96,4 @@ def summarize(text: str) -> tuple[str, str]:
     except Exception as e:
         print(f"エラー: OpenAI API 呼び出し失敗: {e}", file=sys.stderr)
         sys.exit(1)
+        # add better error handling
