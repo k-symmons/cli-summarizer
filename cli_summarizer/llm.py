@@ -3,8 +3,21 @@ import os
 import pathlib
 import sys
 import urllib.request
+from enum import Enum
+from typing import TypedDict
 
 _ENV_PATH = pathlib.Path.home() / ".config" / "cli-summarizer" / ".env"
+
+
+class SummaryResult(TypedDict):
+    summary: str
+    filename: str
+
+class Length(str, Enum):
+    short = "short"
+    medium = "medium"
+    long = "long"
+
 
 def save_api_key_to_env(api_key):
     """APIキーを .env ファイルに保存する"""
@@ -32,7 +45,7 @@ def load_env():
             print(f"警告: .env の読み込みに失敗しました: {e}", file=sys.stderr)
 
 
-def summarize(text: str) -> tuple[str, str]:
+def summarize(input_text: str, length: Length) -> SummaryResult:
     """
     テキストを OpenAI API に送信し、要約と推奨ファイル名を取得する。
     標準ライブラリの urllib を使用し、JSON 形式で結果を受け取る。
@@ -40,7 +53,7 @@ def summarize(text: str) -> tuple[str, str]:
     Args:
         text: 入力テキスト
     Returns:
-        tuple: (summarized_text, suggested_filename)
+        SummaryResult: (summarized_text, suggested_filename)
     """
     # if the user already has OPENAI_API_KEY set in their shell (e.g. .zshrc), skip reading the file
     if not os.environ.get("OPENAI_API_KEY"):
@@ -72,7 +85,7 @@ def summarize(text: str) -> tuple[str, str]:
                     "{\"summary\": \"Markdown形式の要約文\", \"filename\": \"ファイル名(拡張子なし)\"}"
                 )
             },
-            {"role": "user", "content": f"以下のテキストを詳細に読み解き、入力言語と同じ言語で、構造化された美しいMarkdownで要約を作成し、ファイル名を提案してください：\n\n{text}"}
+            {"role": "user", "content": f"以下のテキストを詳細に読み解き、入力言語と同じ言語で、構造化された美しいMarkdownで{length.value}な長さの要約を作成し、ファイル名を提案してください：\n\n{input_text}"}
         ],
         "response_format": {"type": "json_object"}
     }).encode("utf-8")
@@ -86,8 +99,7 @@ def summarize(text: str) -> tuple[str, str]:
             
             summary = content.get("summary", "")
             filename = content.get("filename", "summary")
-            
-            return summary, filename
+            return SummaryResult(summary=summary, filename=filename)
             
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")
@@ -96,4 +108,4 @@ def summarize(text: str) -> tuple[str, str]:
     except Exception as e:
         print(f"エラー: OpenAI API 呼び出し失敗: {e}", file=sys.stderr)
         sys.exit(1)
-        # add better error handling
+    # add better error handling later, too busy

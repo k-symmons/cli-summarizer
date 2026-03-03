@@ -2,8 +2,9 @@ import argparse
 import os
 import pathlib
 import sys
+from typing import TypedDict
 
-from .llm import summarize, _ENV_PATH,save_api_key_to_env
+from .llm import summarize,save_api_key_to_env,Length
 
 
 def parse_args():
@@ -12,10 +13,13 @@ def parse_args():
     parser.add_argument("file", nargs="?", type=str, help="入力ファイルのパス")
     parser.add_argument("-t", "--text", type=str, help="直接テキストを指定")
     parser.add_argument("-key", "--key", type=str, help="OpenAI APIキーを直接指定")
+    parser.add_argument("-l", "--length",type=Length, choices=Length, help="要約の長さを指定")
     args = parser.parse_args()
 
     if not args.file and not args.text and not args.key:
         parser.error("ファイル、-t でテキスト、または -key でAPIキーを指定してください")
+    if not args.length:
+        args.length = Length.medium
     return args
 
 
@@ -73,12 +77,14 @@ def main():
         sys.exit(1)
 
     print("要約を開始します...")
-    summary, filename_base = summarize(content)
-    output_path = save_summary(filename_base, summary)
+    result = summarize(content,args.length)
+    output_path = save_summary(result["filename"], result["summary"])
     print(f"要約を {output_path} に保存しました。")
     print("-" * 20)
-    print(summary)
+    print(result["summary"])
 
 
 if __name__ == "__main__":
     main()
+
+# test
